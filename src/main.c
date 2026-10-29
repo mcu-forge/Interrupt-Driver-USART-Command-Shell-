@@ -1,11 +1,18 @@
 #include<usart.h>
 #include<gpio.h>
+#include<ring_buffer.h>
 
-volatile bool flag = 0;
+#define ring_mem_len 64
+#define LEN 100
+char data[LEN];
+uint8_t idx = 0 ;
+uint8_t ring_mem[ring_mem_len];
+ring_t rx_ring;
+
 
 void USART2_IRQHandler(void){
     if(USART2->SR & USART_SR_RXNE){
-        USART_RX_Buffer_Push((uint8_t)(USART2->DR & 0xFFU));
+       ring_push(&rx_ring,(uint8_t)(USART2->DR & 0xFFU));
     }
 }   
 
@@ -25,28 +32,34 @@ int main(){
     USART_Init(USART2);
     USART_CONFIG(USART2,115200,BIT_8,STOP_BIT_1);
     USART_Start(USART2);
-    USART_RX_Buffer_Init();
+//    USART_RX_Buffer_Init();
+    ring_init(&rx_ring,ring_mem,ring_mem_len);
     USART_RX_Interrupt_Enable(USART2);
 
     while (1)
-    {    
-      
+    {
         if(get_UsartBusClock(USART2) == 16000000){
-            GPIO_SET(GPIOD,13);
+            GPIO_SET(GPIOD, 13);
         }
         else{
-            GPIO_RESET(GPIOD,13);
-        }
+            GPIO_RESET(GPIOD, 13);
+        }  
         uint8_t byte;
-        if (USART_RX_Buffer_Pop(&byte)) {
-            if (byte == 'a')
-                GPIO_SET(GPIOD, 12);
-            else
-                GPIO_RESET(GPIOD, 12);
-        } 
+        if(ring_pop(&rx_ring,&byte)){
+            if(byte == '\r' || byte == '\n'){
+                data[idx] = '\0';
+                idx = 0;
+            }
+            else{
+                data[idx++] = byte;
+            }
+            
+        }
+        if(strcmp(data,"This is a test message") == 0){GPIO_SET(GPIOD,GPIO_PIN_12);}
+        else{GPIO_RESET(GPIOD,GPIO_PIN_12);}
 
-    }
-   
+
+    }                                                   
 
 
 return 0;    
