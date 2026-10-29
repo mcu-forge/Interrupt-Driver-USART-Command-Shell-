@@ -1,5 +1,9 @@
 #include<usart.h>
 
+#define buff_size 100
+static uint8_t rx_buff[buff_size];
+static volatile uint16_t rx_head = 0;
+static volatile uint16_t rx_tail = 0; 
 
 void USART_Init(USART_TypeDef *usart){
      if(usart == USART1){
@@ -130,4 +134,90 @@ uint32_t get_UsartBusClock(USART_TypeDef *usart){
     else{
         return APB1_clk;
     } 
+}
+
+
+
+//------------Interrupts and Ring buffer------------//
+void USART_RX_Interrupt_Enable(USART_TypeDef *usart){
+    usart->CR1 |= USART_CR1_RXNEIE;
+    if(usart == USART1){
+        NVIC_EnableIRQ(USART1_IRQn);
+    }
+    else if(usart == USART2){
+        NVIC_EnableIRQ(USART2_IRQn);
+    }
+    else if(usart == USART3){
+        NVIC_EnableIRQ(USART3_IRQn);
+    }
+    else if(usart == UART4){
+        NVIC_EnableIRQ(UART4_IRQn);
+    }
+    else if(usart == UART5){
+        NVIC_EnableIRQ(UART5_IRQn);
+    }
+    else if(usart == USART6){
+        NVIC_EnableIRQ(USART6_IRQn);
+    }
+
+}
+
+void USART_RX_Interrupt_Disable(USART_TypeDef *usart){
+        usart->CR1 &= ~USART_CR1_RXNEIE;
+    if(usart == USART1){
+        NVIC_DisableIRQ(USART1_IRQn);
+    }
+    else if(usart == USART2){
+        NVIC_DisableIRQ(USART2_IRQn);
+    }
+    else if(usart == USART3){
+        NVIC_DisableIRQ(USART3_IRQn);
+    }
+    else if(usart == UART4){
+        NVIC_DisableIRQ(UART4_IRQn);
+    }
+    else if(usart == UART5){
+        NVIC_DisableIRQ(UART5_IRQn);
+    }
+    else if(usart == USART6){
+        NVIC_DisableIRQ(USART6_IRQn);
+    }
+}
+
+
+void USART_RX_Buffer_Init(void){
+    rx_head = 0;
+    rx_tail = 0;
+}
+
+void USART_RX_Buffer_Push(uint8_t byte){
+    uint16_t next = (rx_head +1) % buff_size;
+    if(next == rx_tail){
+        return;
+    }
+    else{
+        rx_buff[rx_head] = byte;
+        rx_head = next;
+    }
+}
+
+
+bool USART_RX_Buffer_Pop(uint8_t *byte){
+
+    if(rx_tail == rx_head){
+        return false;
+    }
+    else{
+        *byte = rx_buff[rx_tail];
+        rx_tail = (rx_tail+1) % buff_size;
+        return true;
+    }
+}
+
+bool USART_RX_Buffer_IsEmpty(void){
+    return rx_head == rx_tail;
+}
+
+uint16_t USART_RX_Buffer_Count(void){
+    return (rx_head + buff_size - rx_tail) % buff_size;
 }

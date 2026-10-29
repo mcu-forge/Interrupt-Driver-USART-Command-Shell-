@@ -3,6 +3,7 @@
 
 
 #include<stm32f407xx.h>
+#include<core_cm4.h>
 #include<string.h>
 #include<stdio.h>
 #include<stdint.h>
@@ -34,6 +35,16 @@ void USART_SendBuffer(USART_TypeDef *usart, const uint8_t *buf, uint16_t len);
 uint8_t USART_Receive(USART_TypeDef *usart);
 void USART_ReceiveString(USART_TypeDef *usart, char *buf , uint16_t max_len);
 
+
+//------------Interrupts------------//
+void USART_RX_Interrupt_Enable(USART_TypeDef *usart);
+void USART_RX_Interrupt_Disable(USART_TypeDef *usart);
+
+void USART_RX_Buffer_Init(void);
+void USART_RX_Buffer_Push(uint8_t byte);
+bool USART_RX_Buffer_Pop(uint8_t *byte);
+bool USART_RX_Buffer_IsEmpty(void);
+uint16_t USART_RX_Buffer_Count(void);
 
 uint32_t get_UsartBusClock(USART_TypeDef *usart);
 
