@@ -184,6 +184,32 @@ void USART_RX_Interrupt_Disable(USART_TypeDef *usart){
     }
 }
 
+void USART_TX_Interrupt_Enable(USART_TypeDef *usart){
+    usart->CR1 |= USART_CR1_TCIE;
+    usart->CR1 |= USART_CR1_TXEIE;
+    if(usart == USART1){
+        NVIC_EnableIRQ(USART1_IRQn );
+    }
+    else if(usart == USART2){
+        NVIC_EnableIRQ(USART2_IRQn);
+    }
+    else if(usart == USART3){
+        NVIC_EnableIRQ(USART3_IRQn);
+    }
+    else if(usart == UART4){
+        NVIC_EnableIRQ(UART4_IRQn);
+    }
+    else if(usart == UART5){
+        NVIC_EnableIRQ(UART5_IRQn);
+    }
+    else if(usart == USART6){
+        NVIC_EnableIRQ(USART6_IRQn);
+    }
+}
+void USART_TX_Interrupt_Disable(USART_TypeDef *usart);
+
+
+
 
 void USART_RX_Buffer_Init(void){
     rx_head = 0;
