@@ -39,6 +39,10 @@ void USART_ReceiveString(USART_TypeDef *usart, char *buf , uint16_t max_len);
 //------------Interrupts------------//
 void USART_RX_Interrupt_Enable(USART_TypeDef *usart);
 void USART_RX_Interrupt_Disable(USART_TypeDef *usart);
+void USART_TX_Interrupt_Enable(USART_TypeDef *usart);
+void USART_Interrupt_Init(USART_TypeDef *usart);
+void USART_Receive_IT(USART_TypeDef *usart, char *str, uint16_t max_len);
+void USART_Send_IT(USART_TypeDef *usart,const uint8_t *buf, uint16_t size);
 
 void USART_RX_Buffer_Init(void);
 void USART_RX_Buffer_Push(uint8_t byte);

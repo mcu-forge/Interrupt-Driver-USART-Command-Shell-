@@ -186,7 +186,7 @@ void USART_RX_Interrupt_Disable(USART_TypeDef *usart){
 
 void USART_TX_Interrupt_Enable(USART_TypeDef *usart){
     usart->CR1 |= USART_CR1_TCIE;
-    usart->CR1 |= USART_CR1_TXEIE;
+    //usart->CR1 |= USART_CR1_TXEIE;
     if(usart == USART1){
         NVIC_EnableIRQ(USART1_IRQn );
     }
@@ -206,8 +206,42 @@ void USART_TX_Interrupt_Enable(USART_TypeDef *usart){
         NVIC_EnableIRQ(USART6_IRQn);
     }
 }
-void USART_TX_Interrupt_Disable(USART_TypeDef *usart);
 
+
+void USART_TX_Interrupt_Disable(USART_TypeDef *usart){
+    usart->CR1 &= ~USART_CR1_TCIE;
+    usart->CR1 &= ~USART_CR1_TXEIE;
+    if(usart == USART1){
+        NVIC_DisableIRQ(USART1_IRQn );
+    }
+    else if(usart == USART2){
+        NVIC_DisableIRQ(USART2_IRQn);
+    }
+    else if(usart == USART3){
+        NVIC_DisableIRQ(USART3_IRQn);
+    }
+    else if(usart == UART4){
+        NVIC_DisableIRQ(UART4_IRQn);
+    }
+    else if(usart == UART5){
+        NVIC_DisableIRQ(UART5_IRQn);
+    }
+    else if(usart == USART6){
+        NVIC_DisableIRQ(USART6_IRQn);
+    }
+}
+
+
+void USART_Interrupt_Init(USART_TypeDef *usart){
+
+
+}
+void USART_Receive_IT(USART_TypeDef *usart, char *str, uint16_t max_len){
+
+}
+void USART_Send_IT(USART_TypeDef *usart,const uint8_t *buf, uint16_t size){
+
+}
 
 
 
